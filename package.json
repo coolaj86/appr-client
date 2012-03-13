@@ -16,6 +16,9 @@
     "semver": "1.0.x",
     "tar": "0.1.x",
     "forEachAsync": "2.1.x",
+    "nowww": "1.x",
+    "github-hook": "1.x",
+    "mime": "1.x",
     "sequence":"2.1.x"
   }
 }
