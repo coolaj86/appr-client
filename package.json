@@ -1,0 +1,21 @@
+{
+  "author": "Eric Jacobs <eric@chomp.us> (http://techosaur.us/)",
+  "name": "apprClient",
+  "description": "The client side of appr.",
+  "version": "0.0.1",
+  "repository": {
+    "url": ""
+  },
+  "engines": {
+    "node": "~0.6.7"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "connect": "~1.8.5",
+    "ahr2": "2.x",
+    "semver": "1.0.x",
+    "tar": "0.1.x",
+    "forEachAsync": "2.1.x",
+    "sequence":"2.1.x"
+  }
+}
