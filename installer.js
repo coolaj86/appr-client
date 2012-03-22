@@ -9,6 +9,7 @@
     , exec = require('child_process').exec
     , request = require('ahr2')
     , pathSep = '/'
+    , mountDir = __dirname + '/mounts/'
     , ಠ_ಠ = false
     ;
 
@@ -59,10 +60,10 @@
 
     function untarAndInstall() {
       var packagePath
-        ,  tempPath = __dirname + pathSep + 'apps' + pathSep + 'vhosts' + pathSep;
+        ,  tempPath = mountDir;
         ;
       if(!selfUpdate) {
-        packagePath = tempPath + packageName + '.local.apps.spotterrf.com' + pathSep;
+        packagePath = tempPath + packageName + pathSep;
       } else {
         packagePath = __dirname;
         tempPath = __dirname;
@@ -91,10 +92,10 @@
     }
 
     function installDeps(packageName) {
-      var child = exec("cd "  + __dirname
-                              + pathSep + "apps" + pathSep + "vhosts" + pathSep
+      var child = exec("cd "  + mountDir
+                              + pathSep
                               + packageName
-                              + ".local.apps.spotterrf.com && npm install"
+                              + "&& npm install"
                     , function(error, stdout, stderr) {
         if(error) {
           console.error("Problem installing dependencies: ", error);
@@ -104,8 +105,6 @@
         console.log(stderr);
         if(!selfUpdate) {
           responder.end(JSON.stringify({success: true, data: packageName + " installed!"}));
-          console.log('request to restart is about to fire!!!');
-    //      request.post('http://spotter:spotterappsrestart@' + packageName + '.local.apps.spotterrf.com:8080/github-hook');
           process.exit();
         }
       });

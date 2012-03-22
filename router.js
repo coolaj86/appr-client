@@ -7,6 +7,7 @@
     , installer = require('./installer')
     , createSequence = require('sequence')
     , sequence = createSequence()
+    , mountDir = __dirname + '/mounts'
     ;
 
   function getTarget() {
@@ -34,7 +35,7 @@
     function nabLocalList(req,res) {
       var installed = []
         ;
-      fs.readdir(__dirname + '/apps/vhosts/', function(err, files) {
+      fs.readdir(mountDir, function(err, files) {
         if(err) {
           console.error("Problem reading vhost directory:", err);
           res.end(JSON.stringify({success: false, message: err}));

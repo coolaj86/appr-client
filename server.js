@@ -12,8 +12,8 @@
     , port = 7770
     , curVer = "0.0.2"
     , args = process.argv
-    , vhostDir = __dirname + '/apps/vhosts'
-    , vhosts = require('./apps/server.js').create(vhostDir)
+    , mountDir = __dirname + '/mounts'
+    , mounter = require('connect-mounter').create(mountDir)
     , app
     ;
 
@@ -45,7 +45,7 @@
   }
 
   app = connect()
-    .use(vhosts)
+    .use(mounter)
     .use(connect.router(pullRoute))
     .use(connect.static(publicPath))
     .use(connect.directory(publicPath))
