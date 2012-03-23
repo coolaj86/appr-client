@@ -20,6 +20,7 @@
     "github-hook": "1.x",
     "mime": "1.x",
     "sequence":"2.1.x",
-    "connect-mounter": "1.0.0"
+    "connect-mounter": "1.0.0",
+    "connect-xcors": "*"
   }
 }

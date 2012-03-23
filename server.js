@@ -5,6 +5,7 @@
     , fs = require('fs')
     , semver = require('semver')
     , request = require('ahr2')
+    , xcors = require('connect-xcors')
     , installer = require('./installer')
     , pullRoute = require('./router')
     , server = "http://apps.spotterrf.com:3999"
@@ -14,6 +15,11 @@
     , args = process.argv
     , mountDir = __dirname + '/mounts'
     , mounter = require('connect-mounter').create(mountDir)
+    , xcorsOptions =  { origins: ["http://apps.spotterrf.com"]
+                      , methods: ['GET', 'POST']
+                      , headers: ['Content-Type', 'Accept']
+                      , credentials: false
+                      }
     , app
     ;
 
@@ -46,6 +52,7 @@
 
   app = connect()
     .use(mounter)
+    .use(xcors(xcorsOptions))
     .use(connect.router(pullRoute))
     .use(connect.static(publicPath))
     .use(connect.directory(publicPath))

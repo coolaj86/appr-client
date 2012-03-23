@@ -11,6 +11,7 @@
     , pathSep = '/'
     , mountDir = __dirname + '/mounts/'
     , ಠ_ಠ = false
+    , mainServer = 'http://apps.spotterrf.com'
     ;
 
   if(process.platform === 'win32') {
