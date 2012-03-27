@@ -43,6 +43,10 @@
         }
 
         forEachAsync(files,function(next, fileName, index) {
+          if(/^\./.test(fileName)) {
+            next();
+            return;
+          }
           installed.push(fileName.replace(/\.local\.apps\.spotter.*/g, ""));
           next();
         }).then(function() {
