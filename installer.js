@@ -96,7 +96,7 @@
       var child = exec("cd "  + mountDir
                               + pathSep
                               + packageName
-                              + "&& npm install"
+                              + "&& /usr/local/bin/npm install"
                     , function(error, stdout, stderr) {
         if(error) {
           console.error("Problem installing dependencies: ", error);
