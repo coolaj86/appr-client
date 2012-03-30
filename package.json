@@ -21,6 +21,7 @@
     "mime": "1.x",
     "sequence":"2.1.x",
     "connect-mounter": "1.0.0",
-    "connect-xcors": "*"
+    "connect-xcors": "*",
+    "npm": "1.1.x"
   }
 }

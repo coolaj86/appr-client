@@ -6,6 +6,7 @@
     , tar = require('tar')
     , zlib = require('zlib')
     , semver = require('semver')
+    , npm = require('npm')
     , exec = require('child_process').exec
     , request = require('ahr2')
     , pathSep = '/'
@@ -61,7 +62,7 @@
 
     function untarAndInstall() {
       var packagePath
-        ,  tempPath = mountDir;
+        , tempPath = mountDir;
         ;
       if(!selfUpdate) {
         packagePath = tempPath + packageName + pathSep;
@@ -70,6 +71,7 @@
         tempPath = __dirname;
       }
       if(!path.exists(packagePath)) {
+        console.log('TEMPPATH', tempPath);
         console.log('PACKAGEPATH', packagePath);
         //fs.mkdirSync(packagePath, parseInt('0755', 8));
       }
@@ -81,36 +83,39 @@
             responder.end(JSON.stringify({success: false, data: er}));
           }
         })
-        .on("end", function() {
+        .on("close", function() {
           if(selfUpdate) {
             process.exit();
           } else {
-            fs.renameSync(tempPath + pathSep + 'package' + pathSep, packagePath);
-            console.log(packageName + ' is installed!\nNow installing its dependencies.');
-            installDeps(packageName);
+            // This setTimeout is a shim to get around node-tar's bug where it tries to chown
+            // things after it's done extracting -_-.
+            setTimeout(function() {
+              fs.rename(tempPath + pathSep + 'package' + pathSep, packagePath, function() {
+                console.log(packageName + ' is installed!\nNow installing its dependencies.');
+                installDeps(packageName);
+              });
+            }, 100);
           }
         })
     }
 
     function installDeps(packageName) {
-      var child = exec("cd "  + mountDir
-                              + pathSep
-                              + packageName
-                              + "&& /usr/local/bin/npm install"
-                    , function(error, stdout, stderr) {
-        if(error) {
-          console.error("Problem installing dependencies: ", error);
-          return;
-        }
-        console.log(stdout);
-        console.log(stderr);
-        if(!selfUpdate) {
-          responder.end(JSON.stringify({success: true, data: packageName + " installed!"}));
-          process.exit();
-        }
+      npm.load(function(er) {
+        console.log('npm.load called');
+        npm.prefix = mountDir + pathSep + packageName;
+        npm.install(function(er) {
+          console.log('this is the npm.install callback');
+          if(er) {
+            console.error("Problem installing dependencies: ", error);
+            responder.end(JSON.stringify({success: false, data: packageName + ' failed installing.'}));
+            return;
+          }
+          if(!selfUpdate) {
+            responder.end(JSON.stringify({success: true, data: packageName + ' installed'}));
+            process.exit();
+          }
+        });
       });
-     
-   
     }
   }
 
