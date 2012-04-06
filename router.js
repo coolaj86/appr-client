@@ -6,6 +6,7 @@
     , request = require('ahr2')
     , installer = require('./installer')
     , createSequence = require('sequence')
+    , rimraf = require('rimraf')
     , sequence = createSequence()
     , mountDir = __dirname + '/mounts'
     ;
@@ -19,9 +20,10 @@
     app.get("/installed", nabLocalList);
     app.get("/alive", itsalive);
     app.post("/install/:packageName", findTarball);
+    app.post("/delete/:packageName", deleteApp);
 
     function itsalive(req, res) {
-      res.end(JSON.stringify({ success: true, message: "It's ALIVE!!!!!"}));
+      res.end(JSON.stringify({ success: true, message: "It's ALIVE!!!!!" }));
     }
     function nabPackageList(req,res) {
       request.get(getTarget()).when(function(err, ahr, data) {
@@ -70,6 +72,27 @@
           }
         }
         installer(data.dist.tarball, req.params.packageName, data.version, false, res);
+      });
+    }
+
+    function deleteApp(req,res) {
+      fs.stat(mountDir + '/' + req.params.packageName, function(err, stats) {
+        if(err || !stats.isDirectory()) {
+          res.end(JSON.stringify({ success: false, message: "Package '" 
+          + req.params.packageName 
+          + "' does not exist." }));
+          return;
+        }
+        rimraf(mountDir + '/' + req.params.packageName, function(er) {
+          if(er) {
+            console.error("Problem removing package '"+req.params.packageName+"': "+ er);
+            res.end(JSON.stringify({ success: false, message: "Problem removing package'"
+            + req.params.packageName
+            + "': "+ er}));
+            return;
+          }
+          res.end(JSON.stringify({success: true, data: req.params.packageName}));
+        });
       });
     }
     module.exports = app;

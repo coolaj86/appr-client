@@ -23,7 +23,7 @@
                       }
     , app
     ;
-
+  console.log('mounter:', mounter);
   console.log('Checking for updates...');
   request.get(server + "/version").when(function(err, ahr, data) {
     if(err || data.error == true) {
@@ -55,6 +55,8 @@
     .use(mounter)
     .use(xcors(xcorsOptions))
     .use(connect.router(pullRoute))
+    //TODO remove this static / directory serving. Everything should be
+    // being pulled from the HTML5 webapp already.
     .use(connect.static(publicPath))
     .use(connect.directory(publicPath))
     ;
