@@ -15,7 +15,9 @@
     , curVer = "0.0.2"
     , args = process.argv
     , mountDir = __dirname + '/mounts'
-    , mounter = require('connect-mounter').create(mountDir)
+    , mounterFactory = require('connect-mounter')
+    , mounter = mounterFactory.create(mountDir)
+    , failures = mounterFactory.fail
     , xcorsOptions =  { origins: ["http://apps.spotterrf.com"]
                       , methods: ['GET', 'POST']
                       , headers: ['Content-Type', 'Accept']
@@ -23,8 +25,7 @@
                       }
     , app
     ;
-  console.log('mounter:', mounter);
-  console.log('Checking for updates...');
+  console.log('BAD APPS:', failures);
   request.get(server + "/version").when(function(err, ahr, data) {
     if(err || data.error == true) {
       console.log('Could not contact update server. Going it alone...');
