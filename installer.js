@@ -1,3 +1,4 @@
+/*jshint strict:true node:true es5:true onevar:true laxcomma:true laxbreak:true*/
 (function() {
   "use strict";
   
@@ -11,12 +12,13 @@
     , request = require('ahr2')
     , pathSep = '/'
     , mountDir = __dirname + '/mounts/'
-    , ಠ_ಠ = false
+    , weirdThing = false
     , mainServer = 'http://apps.spotterrf.com'
+    //, mainServer = 'http://hurpdurp.com'
     ;
 
   if(process.platform === 'win32') {
-    ಠ_ಠ = true;
+    weirdThing = true;
     pathSep = '\\';
   }
 
@@ -62,8 +64,9 @@
 
     function untarAndInstall() {
       var packagePath
-        , tempPath = mountDir;
+        , tempPath = mountDir
         ;
+
       if(!selfUpdate) {
         packagePath = tempPath + packageName + pathSep;
       } else {
@@ -96,7 +99,7 @@
               });
             }, 100);
           }
-        })
+        });
     }
 
     function installDeps(packageName) {
@@ -106,7 +109,7 @@
         npm.install(function(er) {
           console.log('this is the npm.install callback');
           if(er) {
-            console.error("Problem installing dependencies: ", error);
+            console.error("Problem installing dependencies: ", er);
             responder.end(JSON.stringify({success: false, data: packageName + ' failed installing.'}));
             return;
           }

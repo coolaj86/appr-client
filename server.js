@@ -1,4 +1,5 @@
 #!/usr/local/bin/node
+/*jshint strict:true node:true es5:true onevar:true laxcomma:true laxbreak:true*/
 (function () {
   "use strict";
  
@@ -10,6 +11,7 @@
     , installer = require('./installer')
     , pullRoute = require('./router')
     , server = "http://apps.spotterrf.com:3999"
+    //, server = "http://hurpdurp.com:3999"
     , publicPath = __dirname + '/public'
     , port = 7770
     , curVer = "0.0.2"
@@ -18,7 +20,9 @@
     , mounterFactory = require('connect-mounter')
     , mounter = mounterFactory.create(mountDir)
     , failures = mounterFactory.fail
-    , xcorsOptions =  { origins: ["http://apps.spotterrf.com"]
+    , xcorsOptions =  { 
+                        origins: ["http://apps.spotterrf.com"]
+                        //origins: ["http://hurpdurp.com"]
                       , methods: ['GET', 'POST']
                       , headers: ['Content-Type', 'Accept']
                       , credentials: false
@@ -27,7 +31,7 @@
     ;
   console.log('BAD APPS:', failures);
   request.get(server + "/version").when(function(err, ahr, data) {
-    if(err || data.error == true) {
+    if(err || data.error === true) {
       console.log('Could not contact update server. Going it alone...');
       return;
     }
@@ -39,7 +43,7 @@
     }
   });
 
-  if((parseFloat(args[2]) == parseInt(args[2])) && !isNaN(args[2])) {
+  if((parseFloat(args[2]) === parseInt(args[2], 10)) && !isNaN(args[2])) {
     port = args[2];
   }
 
