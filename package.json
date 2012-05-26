@@ -5,7 +5,7 @@
   ],
   "name": "webappcenter-client",
   "description": "The client (laptop / desktop) side of appr.",
-  "version": "0.1.4",
+  "version": "0.1.6",
   "repository": {
     "url": "git://github.com/coolaj86/appr-client.git"
   },
@@ -15,7 +15,7 @@
   "bin": {
     "webappscenter-service": "bin/server"
   },
-  "main": "server",
+  "main": "server/index",
   "scripts": {
     "prepublish": "node deploy"
   },
@@ -40,6 +40,7 @@
     "connect-xcors": "*",
     "npm": "1.1.x",
     "rimraf": "2.0.x",
-    "connect_router": "~1.8.6"
+    "connect_router": "~1.8.6",
+    "fs.extra": "~1.1.1"
   }
 }

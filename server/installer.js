@@ -2,7 +2,7 @@
 (function() {
   "use strict";
   
-  var fs = require('fs')
+  var fs = require('fs.extra')
     , path = require('path')
     , tar = require('tar')
     , zlib = require('zlib')
@@ -10,42 +10,30 @@
     , npm = require('npm')
     , exec = require('child_process').exec
     , request = require('ahr2')
-    , pathSep = '/'
-    , mountDir = __dirname + '/mounts/'
+    , mountDir = path.join(__dirname, 'mounts')
     , weirdThing = false
-    , mainServer = 'http://apps.spotterrf.com'
-    //, mainServer = 'http://hurpdurp.com'
     ;
 
   if(process.platform === 'win32') {
     weirdThing = true;
-    pathSep = '\\';
   }
 
-
-  function installer(tarballLocation, packageName, newVer, selfUpdate, responder, server) {
-    if(!selfUpdate) {
-      request.get(tarballLocation).when(pullAndSave);
-    } else {
-      request.get(server + "/releases/" + newVer + "/browser.tgz").when(pullAndSave);
-    }
-
+  function installer(tarballLocation, packageName, newVer, selfUpdate, responder, wacServerUrl) {
     function pullAndSave(err, ahr, data) {
       console.log('gunzipping!');
       zlib.gunzip(data, saveTheTar);
     }
 
+    if(selfUpdate) {
+      request.get(wacServerUrl + "/releases/" + newVer + "/client-" + newVer + ".tgz").when(pullAndSave);
+    } else {
+      request.get(tarballLocation).when(pullAndSave);
+    }
+
     function saveTheTar(err, tarball) {
       console.log('about to write');
-      fs.open(__dirname
-              + pathSep + 'downloads' + pathSep
-              + packageName
-              + '-'
-              + newVer
-              + '.tar'
-            , 'w'
-            , parseInt('0644', 8)
-            , function(err, fd) {
+
+      function saveIt(err, fd) {
         if(err) {
           console.log("Error opening file:", err);
           return;
@@ -59,53 +47,76 @@
           console.log('File Written!!');
           untarAndInstall();
         });
-      });
+      }
+
+      fs.open(
+          path.join(__dirname, 'downloads', packageName + '-' + newVer + '.tar')
+        , 'w'
+        , parseInt('0644', 8)
+        , saveIt
+      );
     }
 
     function untarAndInstall() {
       var packagePath
         , tempPath = mountDir
+        , newPackagePath = path.join(__dirname, 'downloads', packageName + '-' + newVer + '.tar')
         ;
 
       if(!selfUpdate) {
-        packagePath = tempPath + packageName + pathSep;
-      } else {
         packagePath = __dirname;
         tempPath = __dirname;
+      } else {
+        packagePath = path.join(tempPath, packageName);
       }
-      if(!path.exists(packagePath)) {
+
+      if(!path.existsSync(packagePath)) {
         console.log('TEMPPATH', tempPath);
         console.log('PACKAGEPATH', packagePath);
         //fs.mkdirSync(packagePath, parseInt('0755', 8));
       }
-      fs.createReadStream(__dirname + pathSep + 'downloads' + pathSep + packageName + '-' + newVer + '.tar')
+
+      function onError(er) {
+        console.error("error during extraction:", er);
+        if(!selfUpdate) {
+          responder.end(JSON.stringify({success: false, data: er}));
+        }
+      }
+
+      function onClose() {
+        function thingToDo() {
+          var newPath = path.join(tempPath, 'package')
+            ;
+
+          // TODO clear out old files, but not data (like the self-update tar), etc
+          //fs.rmrf(packagePath, function () {
+            fs.rename(newPath, packagePath, function() {
+              console.log(packageName + ' is installed!\nNow installing its dependencies.');
+              installDeps(packageName);
+            });
+          //});
+        }
+
+        if(selfUpdate) {
+          process.exit();
+        } else {
+          // This setTimeout is a shim to get around node-tar's bug where it tries to chown
+          // things after it's done extracting -_-.
+          setTimeout(thingToDo, 100);
+        }
+      }
+
+      fs.createReadStream(newPackagePath)
         .pipe(tar.Extract({path: tempPath}))
-        .on("error", function(er) {
-          console.error("error during extraction:", er);
-          if(!selfUpdate) {
-            responder.end(JSON.stringify({success: false, data: er}));
-          }
-        })
-        .on("close", function() {
-          if(selfUpdate) {
-            process.exit();
-          } else {
-            // This setTimeout is a shim to get around node-tar's bug where it tries to chown
-            // things after it's done extracting -_-.
-            setTimeout(function() {
-              fs.rename(tempPath + pathSep + 'package' + pathSep, packagePath, function() {
-                console.log(packageName + ' is installed!\nNow installing its dependencies.');
-                installDeps(packageName);
-              });
-            }, 100);
-          }
-        });
+        .on("error", onError)
+        .on("close", onClose)
+        ;
     }
 
     function installDeps(packageName) {
       npm.load(function(er) {
         console.log('npm.load called');
-        npm.prefix = mountDir + pathSep + packageName;
+        npm.prefix = path.join(mountDir, packageName);
         npm.install(function(er) {
           console.log('this is the npm.install callback');
           if(er) {
@@ -123,5 +134,4 @@
   }
 
   module.exports = installer;
-
 }());

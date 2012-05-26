@@ -15,8 +15,8 @@
         , credentials: false
       }
     , port = 7770
-    , wacServer = "http://apps.spotterrf.com:3999"
-    //, wacServer = "http://hurpdurp.com:3999"
+    , wacServerUrl = "http://apps.spotterrf.com:3999"
+    //, wacServerUrl = "http://hurpdurp.com:3999"
     /*
      * NORMAL STUFF
      */
@@ -44,7 +44,12 @@
   }
 
   function update() {
-    request.get(wacServer + "/version").when(function(err, ahr, data) {
+    request.get(wacServerUrl + "/version").when(function(err, ahr, data) {
+      var newVer
+        , selfUpdate = true
+        , callback = null
+        ;
+
       if(err || data.error === true) {
         console.log('Could not contact WebAppsCenter update service. Going it alone...');
         return;
@@ -52,8 +57,8 @@
 
       if(semver.gt(data.result, curVer)) {
         console.log("New version detected... downloading and installing!");
-        //newVer = data.result;
-        installer(null, "browser", data.result, true, null, wacServer);
+        newVer = data.result;
+        installer(null, "client", newVer, selfUpdate, callback, wacServerUrl);
       }
     });
   }

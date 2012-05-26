@@ -1,7 +1,9 @@
+/*jshint strict:true node:true es5:true onevar:true laxcomma:true laxbreak:true*/
 (function() {
   "use strict";
 
   var fs = require('fs')
+    , path = require('path')
     , forEachAsync = require('forEachAsync')
     , request = require('ahr2')
     , installer = require('./installer')
@@ -25,6 +27,7 @@
     function itsalive(req, res) {
       res.end(JSON.stringify({ success: true, message: "It's ALIVE!!!!!" }));
     }
+
     function nabPackageList(req,res) {
       request.get(getTarget()).when(function(err, ahr, data) {
         if(err) {
@@ -34,6 +37,7 @@
         res.end(JSON.stringify(data));
       });
     }
+
     function nabLocalList(req,res) {
       var installed = []
         ;
