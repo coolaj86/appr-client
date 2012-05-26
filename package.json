@@ -1,9 +1,11 @@
 {
   "author": "Eric Jacobs <eric@chomp.us> (http://techosaur.us/)",
-  "maintainers": ["AJ ONeal <coolaj86@gmail.com> (http://coolaj86.info)"],
+  "maintainers": [
+    "AJ ONeal <coolaj86@gmail.com> (http://coolaj86.info)"
+  ],
   "name": "webappcenter-client",
   "description": "The client (laptop / desktop) side of appr.",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "repository": {
     "url": "git://github.com/coolaj86/appr-client.git"
   },
@@ -13,7 +15,7 @@
   "bin": {
     "webappscenter-service": "bin/server"
   },
-  "main":"server",
+  "main": "server",
   "scripts": {
     "prepublish": "node deploy"
   },
@@ -33,7 +35,7 @@
     "nowww": "1.x",
     "github-hook": "1.x",
     "mime": "1.x",
-    "sequence":"2.1.x",
+    "sequence": "2.1.x",
     "connect-mounter": "1.0.0",
     "connect-xcors": "*",
     "npm": "1.1.x",

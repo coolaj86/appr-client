@@ -9,7 +9,8 @@
     , fs = require('fs')
     , path = require('path')
     , util = require('util')
-    , pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json')))
+    , pkgConfigPath = path.join(__dirname, 'package.json')
+    , pkg = JSON.parse(fs.readFileSync(pkgConfigPath))
     , request = require('ahr2')
     , read = require('read')
     , semver = require('semver')
@@ -59,11 +60,13 @@
       request.get(wacProto + wacHost + '/version/' + input).when(next);
     })
     .then(function (next, err, ahr2, data) {
-      console.log('\n\n\n\nVersion: ' + data.result, '\n\n\n');
       nextVer = data.result;
+      console.log('\n\n\n\nVersion: ' + nextVer + '\n\n\n');
+      pkg.version = nextVer;
+      fs.writeFileSync(pkgConfigPath, JSON.stringify(pkg, null, '  '));
       doDeploy(next);
     })
-    .then(function () { /* do nothing */ })
+    //.then(function () { /* do nothing */ console.log('comment me to do real uploads'); })
     .then(doTar)
     .then(function (next, err, ahr2, data) {
       if (err) {
@@ -88,12 +91,16 @@
       util.print(chunk.toString('utf8'));
     });
     tar.on('exit', function (code) {
-      console.log('tar complete');
+      var url = wacProto + 'somethingkindasecret:yknow@' + wacHost + '/version/' + releaseLevel
+        , buffer = Buffer.concat(chunks)
+        ;
+
+      console.log('tar complete', buffer.length / (1024 * 1024));
       //console.log(wacProto + 'somethingkindasecret:yknow@' + wacHost + '/version/' + releaseLevel);
       request.post(
-          wacProto + 'somethingkindasecret:yknow@' + wacHost + '/version/' + releaseLevel
+          url
         , null
-        , Buffer.concat(chunks)
+        , buffer
       ).when(next);
       //process.exit(code);
     });

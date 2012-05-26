@@ -17,12 +17,13 @@
     , port = 7770
     , wacServer = "http://apps.spotterrf.com:3999"
     //, wacServer = "http://hurpdurp.com:3999"
-    , curVer = "0.0.2"
     /*
      * NORMAL STUFF
      */
     , fs = require('fs')
     , path = require('path')
+    , pkgConfigPath = path.join(__dirname, '..', 'package.json')
+    , curVer = JSON.parse(fs.readFileSync(pkgConfigPath)).version
     , connectRouter = require('connect_router')
     , semver = require('semver')
     , request = require('ahr2')
