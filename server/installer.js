@@ -10,8 +10,11 @@
     , npm = require('npm')
     , exec = require('child_process').exec
     , request = require('ahr2')
-    , mountDir = path.join(__dirname, 'mounts')
+    , serverRoot = __dirname
+    , mountDir = path.join(serverRoot, 'mounts')
     , weirdThing = false
+    // careful to keep pkgRoot as the real root
+    , pkgRoot = path.join(__dirname, '..')
     ;
 
   if(process.platform === 'win32') {
@@ -63,9 +66,9 @@
         , newPackagePath = path.join(__dirname, 'downloads', packageName + '-' + newVer + '.tar')
         ;
 
-      if(!selfUpdate) {
-        packagePath = __dirname;
-        tempPath = __dirname;
+      if(selfUpdate) {
+        packagePath = pkgRoot;
+        tempPath = pkgRoot;
       } else {
         packagePath = path.join(tempPath, packageName);
       }
