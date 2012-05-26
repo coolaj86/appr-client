@@ -9,6 +9,12 @@ html
     #css-body-wrapper
       h1.
         WebAppsCenter Client
+      #app
+        a(href='/update') Check for Updates...
+      #update-server
+        form#update-form(action='/settings', method='POST', enctype='application/json')
+          input(name='webapp-server') hurpdurp.iriscouch.com
+          input(type='submit')
       #todo
         ul
           li.
