@@ -16,7 +16,7 @@
     , semver = require('semver')
     , sequence = require('sequence').create()
     , wacProto = 'http://'
-    , wacHost = "localhost:4040"
+    , wacHost = process.argv[2] || "localhost:4040"
     , nextVer
     , releaseLevel
     ;
