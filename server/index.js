@@ -70,10 +70,5 @@
     .use(connect.directory(publicPath))
     ;
 
-  if (require.main === module) {
-    app.listen(port);
-    console.log("Now serving on port " + port + ".");
-  }
-
   module.exports = app;
 }());
