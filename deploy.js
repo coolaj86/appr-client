@@ -29,7 +29,7 @@
 
   sequence
     .then(function (next) {
-      read({ "prompt": "Where will we be publishing today? (" + wacHost + ")" }, next);
+      read({ "prompt": "Where will we be publishing today? (" + wacHost + "): " }, next);
     })
     .then(function (next, err, input) {
       wacHost = input || wacHost;
@@ -46,7 +46,7 @@
       if (!semver.gt(pkg.version, data.result)) {
         console.warn('Try to keep your package.json.version up-to-date...');
       }
-      read({ "prompt": "Is this a [m]ajor, mi[n]or, or [p]atch release? (p)"}, next);
+      read({ "prompt": "Is this a [m]ajor, mi[n]or, or [p]atch release? (p): "}, next);
     })
     .then(function (next, err, input) {
       var map = {

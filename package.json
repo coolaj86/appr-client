@@ -1,6 +1,6 @@
 {
   "author": "Eric Jacobs <eric@chomp.us> (http://techosaur.us/)",
-  "maintainers": ["AJ ONeal <coolaj86@gmail.com> (http://coolaj86.info)"]
+  "maintainers": ["AJ ONeal <coolaj86@gmail.com> (http://coolaj86.info)"],
   "name": "webappcenter-client",
   "description": "The client (laptop / desktop) side of appr.",
   "version": "0.1.0",
