@@ -5,7 +5,7 @@
   ],
   "name": "webappcenter-client",
   "description": "The client (laptop / desktop) side of appr.",
-  "version": "0.1.6",
+  "version": "0.1.09",
   "repository": {
     "url": "git://github.com/coolaj86/appr-client.git"
   },

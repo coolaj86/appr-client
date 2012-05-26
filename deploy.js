@@ -83,13 +83,24 @@
       , chunks = []
       ;
 
-    tar = spawn('tar', ['-czf', '-', '.']);
+    tar = spawn('tar', ['-czf', '-'
+      , 'bin'
+      , 'browser'
+      , 'node_modules'
+      , 'package.json'
+      , 'server'
+      , 'server.js'
+      , 'webclient-deployed'
+    ]);
+
     tar.stdout.on('data', function (chunk) {
       chunks.push(chunk);
     });
+
     tar.stderr.on('data', function (chunk) {
       util.print(chunk.toString('utf8'));
     });
+
     tar.on('exit', function (code) {
       var url = wacProto + 'somethingkindasecret:yknow@' + wacHost + '/version/' + releaseLevel
         , buffer = Buffer.concat(chunks)

@@ -15,9 +15,11 @@
     , weirdThing = false
     // careful to keep pkgRoot as the real root
     , pkgRoot = path.join(__dirname, '..')
+    , tmpPath = process.env.TEMP || process.env.TMPDIR || '/tmp'
     ;
 
-  if(process.platform === 'win32') {
+  if(/^win/.exec(process.platform)) {
+    //tmpPath = process.env['TEMP'];
     weirdThing = true;
   }
 
