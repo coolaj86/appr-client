@@ -13,7 +13,10 @@ html
         a(href='/update') Check for Updates...
       #update-server
         form#update-form(action='/settings', method='POST', enctype='application/json')
-          input(name='webapp-server') hurpdurp.iriscouch.com
+          label(for='webapp-server').
+            WebApp Center Server:
+          input(name='webapp-server', value='hurpdurp.iriscouch.com')
+          br
           input(type='submit')
       #todo
         ul

@@ -8,15 +8,15 @@
     /*
      *  CONFIG STUFF that should be moved out
      */
-    , xcorsOptions =  { 
+    , xcorsOptions
+    , xcorsDefaultOptions =  { 
           origins: ["http://apps.spotterrf.com", "http://hurpdurp.com"]
         , methods: ['GET', 'POST']
         , headers: ['Content-Type', 'Accept']
         , credentials: false
       }
     , port = 7770
-    , wacServerUrl = "http://apps.spotterrf.com:3999"
-    //, wacServerUrl = "http://hurpdurp.com:3999"
+    , wacServerUrl = "http://hurpdurp.com"
     /*
      * NORMAL STUFF
      */
@@ -32,33 +32,60 @@
     , pullRoute = require('./router')
     , args = process.argv
     , publicPath = path.join(__dirname, '..', 'webclient-deployed')
+    , releasesPath = path.join(__dirname, '..', 'webclient-deployed', 'releases')
     , mountDir = path.join(__dirname, 'mounts')
     , mounterFactory = require('connect-mounter')
+    , DomStorage = require('dom-storage')
+    , jsonStorage = require('json-storage').create(DomStorage.create(path.join(__dirname, 'settings.json')))
     , mounter = mounterFactory.create(mountDir)
     , failures = mounterFactory.fail
+    , installLock
     , app
     ;
+
+  // TODO allow 3rd party stores to be used via oauth or something
+  //xcorsOptions = jsonStorage.get('xcors');
+  if (!xcorsOptions) {
+    xcorsOptions = xcorsDefaultOptions;
+  }
 
   if (failures) {
     console.log('BAD APPS:', failures);
   }
 
-  function update() {
+  function update(cb) {
     request.get(wacServerUrl + "/version").when(function(err, ahr, data) {
       var newVer
         , selfUpdate = true
         , callback = null
+        , installLockTimeout
         ;
+
+      function removeInstallLock() {
+        installLock = false;
+        clearTimeout(installLockTimeout);
+        installLockTimeout = 0;
+      }
 
       if(err || data.error === true) {
         console.log('Could not contact WebAppsCenter update service. Going it alone...');
         return;
       }
 
+      if (cb) {
+        cb (err || data.error, curVer, newVer);
+      }
+
+      if (installLock) {
+        return;
+      }
+
       if(semver.gt(data.result, curVer)) {
-        console.log("New version detected... downloading and installing!");
+        console.log("New version (" + data.result + ") detected... downloading and installing!");
         newVer = data.result;
+        installLock = true;
         installer(null, "client", newVer, selfUpdate, callback, wacServerUrl);
+        installLockTimeout = setTimeout(removeInstallLock, 15 * 60 * 1000);
       }
     });
   }
@@ -76,13 +103,35 @@
     }
   }
 
-  function router(rest) {
-    rest.get('/update', function (req, res) {
-      update();
-      res.end('{"success": true, "result": null, "errors": []}');
-    });
+  function sendUpdateInfo(req, res) {
+    function sendUpdateInfoHelper(err, curVer, newVer) {
+      var errors = []
+        , success = true
+        ;
+
+      if (err) {
+        errors.push(err);
+        success = false;
+      }
+
+      res.end(JSON.stringify({
+          "success": success
+        , "result": {
+              current: curVer
+            , latest: newVer
+          }
+        , "errors": errors
+      }));
+    }
+    update(sendUpdateInfoHelper);
   }
 
+  function router(rest) {
+    rest.get('/update', sendUpdateInfo);
+  }
+
+  // check for updates every 3 hours
+  setInterval(update, 3 * 60 * 60 * 1000);
   update();
 
   app = connect()
@@ -93,6 +142,7 @@
     //TODO remove this static / directory serving. Everything should be
     // being pulled from the HTML5 webapp already.
     .use(connect.static(publicPath))
+    .use(connect.static(releasesPath))
     .use(connect.directory(publicPath))
     ;
 
