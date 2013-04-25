@@ -14,6 +14,8 @@
     , app
     , server
     , corsOptions = {}
+    , updateChecker
+    , installer
     ;
 
   if (!connect.router) {
@@ -39,6 +41,30 @@
       , license: pkg.license
     }]);
   }
+
+  installer = require('./lib/install-update').create({
+      packageRoot: path.join(__dirname) // where package.json lies
+    , appsPath: path.join(__dirname, 'mounts') // where mounts or vhosts lie
+    , tmpPath: process.env.TMP || process.env.TEMP || process.env.TMPDIR || '/tmp'
+    , complete: function (err, msg) {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        console.log(msg);
+        process.nextTick(function () {
+          process.exit();
+        });
+      }
+  });
+  updateChecker = require('./lib/check-update').create({
+      site: 'http://' + config.masterOrigins[0] + '/webappcenter/update'
+    , version: '0.0.0'
+    , channel: 'beta'
+    , update: function (href, metadata) {
+        installer.install(href, { packageName: 'self', packageVersion: metadata.semver });
+      }
+  });
 
   // TODO mounter & vhoster
   // TODO steve / json
@@ -74,4 +100,6 @@
     console.log("Listening at", server.address());
   });
   app.use('/' + pkg.name, connect.router(router));
+  // '/'
+  app.use(connect.static(path.join(__dirname, 'public')));
 }());
