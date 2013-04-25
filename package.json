@@ -15,7 +15,7 @@
   "bin": {
     "webappscenter-service": "bin/server"
   },
-  "main": "server/index",
+  "main": "server/server",
   "scripts": {
     "prepublish": "node deploy"
   },

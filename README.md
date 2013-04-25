@@ -21,3 +21,26 @@ Pushing a new client version to the server
 ---
 
     node deploy
+
+API
+===
+
+  `GET /alive`
+  `GET /applist`
+  `GET /installed`
+  `POST /install/:appid`
+  `POST /delete/:appid`
+
+Desired API
+---
+
+  `GET /uptime`
+  `GET /version`
+
+  `GET /apps`
+  `GET /apps/:appid`
+
+  `GET /installs`
+  `GET /installs/:appid`
+  `POST /installs/:appid`
+  `DELETE /installs/:appid`

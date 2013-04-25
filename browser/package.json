@@ -7,7 +7,7 @@
     "type": "git",
     "url": "git://github.com/DUMMYORG/DUMMYAPP.git"
   },
-  "main": "lib/index",
+  "main": "lib/browser",
   "scripts": {
     "test": "run-tests"
   },
