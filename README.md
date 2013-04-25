@@ -1,5 +1,5 @@
 
-Keep the last 3 versions or so
+Keep the last 3 versions or so?
 
     ./webappcenter/
         package.json
@@ -15,3 +15,7 @@ Keep the last 3 versions or so
             {
               {appname}: [{ver}, {ver}]
             }
+
+make installable via grunt-contrib-copy (aka rsync)
+
+    npm pack
